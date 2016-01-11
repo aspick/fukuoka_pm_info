@@ -7,9 +7,9 @@ Gem::Specification.new do |spec|
   spec.name          = "fukuoka_pm_info"
   spec.version       = FukuokaPmInfo::VERSION
   spec.authors       = ["aspick"]
-  spec.email         = ["TODO: Write your email address"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.email         = ["yugo@18th-lab.com"]
+  spec.description   = "Fukuoka city PM2.5 information crawler"
+  spec.summary       = "Fukuoka"
   spec.homepage      = ""
   spec.license       = "MIT"
 
