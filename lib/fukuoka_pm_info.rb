@@ -1,10 +1,11 @@
 require "fukuoka_pm_info/version"
 require 'open-uri'
+require 'nokogiri'
 
 module FukuokaPmInfo
 	class Fukuoka
 		def initialize(url = nil, cache = nil)
-			url ||= "http://www.fukuokakanshi.com/mobile2/data/051/MobileHourItemvalue01.htm"
+			url ||= "http://www.fukuokakanshi.com/taikidayitem/Nipokomokubetsu_051_20160111.html"
 
 			if cache && cache.get("content-#{url}")
 				@body_str = cache.get("content-#{url}")
@@ -25,58 +26,36 @@ module FukuokaPmInfo
 				end
 			end
 
-
-			flg = true
-			@br_positions = []
-			while flg
-				unless @br_positions.last
-					pos = @body_str.index('<br>')
-				else
-					pos = @body_str.index('<br>',@br_positions.last + 1)
-				end
-
-				unless pos
-					flg = false
-					break
-				else
-					if pos == @br_positions.last
-						break
-					end
-					@br_positions << pos
-				end
-			end
-		end
-
-		def br_section(index)
-			@body_str[@br_positions[index]+4,@br_positions[index+1]-@br_positions[index]-4].lstrip.rstrip
-		end
-
-		def date_str
-			br_section(3)
+			@dom = Nokogiri::HTML(@body_str)
 		end
 
 		def date
-			str = date_str # 2013年5月14日（火）15時
+			str = @dom.search('.hidtable td').last.text # 測定年月日：2013年5月14日（火）
 			Time.local(*str.scan(/[\d]+/))
 		end
 
 		def fetch_data
 			array = []
-			8.times do |i| 
-				hash = {}
-				hash[:place] = br_section(7 + (i*2))
-				hash[:value] = br_section(8 + (i*2)).gsub("：",'').lstrip
-				array << hash
+			table = @dom.search('#tableBody').first
+
+			table.search('tr').each do |tr|
+				place = tr.search('th').first.text.gsub(/\s/,'')
+				values = tr.search('td').map{|td| td.text}.map{|text| Integer(text) rescue nil }
+
+				array << {
+					place: place,
+					values: values
+				}
+
 			end
 
 			array
 		end
 
 		def unit
-			unit_str = br_section(5)
-			unit_str[unit_str.index('：')+1..-1]
+			@dom.search('.hidtable td')[-2].text.split('：').last.gsub(/\s/,'')
 		end
-		
-	end	
+
+	end
 
 end

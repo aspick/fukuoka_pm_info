@@ -18,12 +18,18 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```
+f = FukuokaPmInfo::Fukuoka.new
+f.fetch_data
+# => [
+    {place: '香椎', values:[10, 10, ... 10, nil, ... nil]},
+    ...
+]
 
-## Contributing
+f.date
+# => 2016-01-11 00:00:00 +0900
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+f.unit
+# => "μg/m3"
+
+```
