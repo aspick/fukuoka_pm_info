@@ -31,7 +31,10 @@ module FukuokaPmInfo
 
 		def date
 			str = @dom.search('.hidtable td').last.text # 測定年月日：2013年5月14日（火）
-			Time.local(*str.scan(/[\d]+/))
+			comp = str.scan(/[\d]+/)
+			comp << [0, 0, 0, 3/8r]
+			comp.flatten!
+			Time.local(*comp)
 		end
 
 		def fetch_data
