@@ -34,7 +34,7 @@ module FukuokaPmInfo
 			comp = str.scan(/[\d]+/)
 			comp << [0, 0, 0, 3/8r]
 			comp.flatten!
-			Time.local(*comp)
+			DateTime.new(*comp)
 		end
 
 		def fetch_data
