@@ -34,6 +34,7 @@ module FukuokaPmInfo
 			comp = str.scan(/[\d]+/)
 			comp << [0, 0, 0, 3/8r]
 			comp.flatten!
+			comp = comp.map{|d| d.to_i}
 			DateTime.new(*comp)
 		end
 
