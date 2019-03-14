@@ -5,7 +5,7 @@ require 'nokogiri'
 module FukuokaPmInfo
 	class Fukuoka
 		def initialize(url = nil, cache = nil)
-			url ||= "http://www.fukuokakanshi.com/taikidayitem/Nipokomokubetsu_051_20160111.html"
+			url ||= "http://www.fukuokakanshi.com/dayreportitem/?itemSelect=10"
 
 			if cache && cache.get("content-#{url}")
 				@body_str = cache.get("content-#{url}")
@@ -13,13 +13,10 @@ module FukuokaPmInfo
 				html = open(url) do |f|
 				  f.read
 				end
-				doc = Nokogiri::HTML.parse(html, nil, 'Shift_JIS')
+				doc = Nokogiri::HTML.parse(html, nil)
 				body = doc.search('//body')
 
-				puts body.to_s.encode("utf-8")
-
-				@body_str = body.to_s.encode("utf-8")
-				@body_str.gsub!('&#160;',' ')
+				@body_str = body.to_s
 
 				if cache
 					cache.set("content-#{url}",@body_str,300)
@@ -30,7 +27,7 @@ module FukuokaPmInfo
 		end
 
 		def date
-			str = @dom.search('.hidtable td').last.text # 測定年月日：2013年5月14日（火）
+			str = @dom.search('//*[@id="day"]').first[:value] # 測定年月日：2013年5月14日（火）
 			comp = str.scan(/[\d]+/)
 			comp << [0, 0, 0, 3/8r]
 			comp.flatten!
@@ -40,7 +37,7 @@ module FukuokaPmInfo
 
 		def fetch_data
 			array = []
-			table = @dom.search('#tableBody').first
+			table = @dom.search('table').first
 
 			table.search('tr').each do |tr|
 				place = tr.search('th').first.text.gsub(/\s/,'')
@@ -57,7 +54,7 @@ module FukuokaPmInfo
 		end
 
 		def unit
-			@dom.search('.hidtable td')[-2].text.split('：').last.gsub(/\s/,'')
+			"μg/m3"
 		end
 
 	end
